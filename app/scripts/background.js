@@ -28,7 +28,11 @@ var tryGetMap = function tryGetMap(url, callback) {
     fetch(url + ".map").then(function (resp) {
       if (resp.status === 200) {
         resp.text().then(function (text) {
-          callback(resp.url, text);
+          if(text.startsWith("{")){
+            callback(resp.url, text);
+          } else {
+            console.log("Not JSON");
+          }
         });
       }
     }).catch(function (err) {
@@ -37,10 +41,10 @@ var tryGetMap = function tryGetMap(url, callback) {
   }, 300);
 };
 
-var isValidSourceMap = function isValidSourceMap(rawSourceMap) {
+var isValidSourceMap = async function isValidSourceMap(rawSourceMap) {
   try {
     var SourceMapConsumer = sourceMap.SourceMapConsumer;
-    var consumer = new SourceMapConsumer(rawSourceMap);
+    var consumer = await new SourceMapConsumer(rawSourceMap);
 
     return consumer.hasContentsOfAllSources();
   } catch (e) {
